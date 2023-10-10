@@ -1,10 +1,11 @@
-package infrastructure
+package lib
 
 import (
 	"context"
 	"erp/api/middlewares"
 	config "erp/config"
 	constants "erp/constants"
+	"erp/infrastructure"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +14,17 @@ import (
 	"go.uber.org/fx"
 )
 
-func NewServer(lifecycle fx.Lifecycle, zap *zap.Logger, config config.Config) *gin.RouterGroup {
+type Handler struct {
+	*gin.RouterGroup
+}
+
+func NewServerGroup(instance *gin.Engine) *Handler {
+	return &Handler{
+		instance.Group("/v1/api"),
+	}
+}
+
+func NewServer(lifecycle fx.Lifecycle, zap *zap.Logger, config *config.Config, db *infrastructure.Database, middlewares *middlewares.GinMiddleware) *gin.Engine {
 	switch config.Server.Env {
 	case constants.Dev, constants.Local:
 		gin.SetMode(gin.DebugMode)
@@ -29,18 +40,20 @@ func NewServer(lifecycle fx.Lifecycle, zap *zap.Logger, config config.Config) *g
 	//	SkipPaths: nil,
 	//})
 	instance := gin.New()
-	middleware := middlewares.NewMiddleware()
-	instance.Use(middleware.ErrorHandler(zap))
-	instance.Use(middleware.JSONMiddleware)
 
-	instance.Use(middleware.CORS)
-	instance.Use(middleware.Logger(zap))
 	//instance.Use(gozap.RecoveryWithZap(zap, true))
-	instance.Use(middleware.JWT(config))
+
+	instance.Use(middlewares.JSONMiddleware)
+	instance.Use(middlewares.CORS)
+	instance.Use(middlewares.Logger)
+	instance.Use(middlewares.ErrorHandler)
+	// instance.Use(middlewares.JWT(config, db))
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			zap.Info("Starting HTTP server")
+
+			SeedRoutes(instance, db)
 			go func() {
 				addr := fmt.Sprint(config.Server.Host, ":", config.Server.Port)
 				if err := instance.Run(addr); err != nil {
@@ -55,5 +68,9 @@ func NewServer(lifecycle fx.Lifecycle, zap *zap.Logger, config config.Config) *g
 		},
 	})
 
-	return instance.Group("/api")
+	return instance
+}
+
+func SeedRoutes(engine *gin.Engine, db *infrastructure.Database) error {
+	return nil
 }

@@ -3,7 +3,7 @@ package infrastructure
 import (
 	"database/sql"
 	config "erp/config"
-	models "erp/models"
+	"erp/models"
 	"fmt"
 	"os"
 
@@ -18,7 +18,7 @@ type Database struct {
 	logger *zap.Logger
 }
 
-func NewDatabase(config config.Config, logger *zap.Logger) *Database {
+func NewDatabase(config *config.Config, logger *zap.Logger) *Database {
 	var err error
 	var sqlDB *sql.DB
 
@@ -32,9 +32,13 @@ func NewDatabase(config config.Config, logger *zap.Logger) *Database {
 			}
 		}
 	}
-	// try to connect again
 
-	logger.Info("Database connected")
+	if err != nil {
+		logger.Fatal("Database connection error", zap.Error(err))
+	} else {
+		logger.Info("Database connected")
+	}
+
 	db := &Database{gormDB, logger}
 
 	db.RegisterTables()
@@ -53,7 +57,7 @@ func NewDatabase(config config.Config, logger *zap.Logger) *Database {
 	return db
 }
 
-func getDatabaseInstance(config config.Config) (db *gorm.DB, err error) {
+func getDatabaseInstance(config *config.Config) (db *gorm.DB, err error) {
 	switch config.Database.Driver {
 	case "mysql":
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
@@ -68,8 +72,9 @@ func getDatabaseInstance(config config.Config) (db *gorm.DB, err error) {
 			return nil, fmt.Errorf("failed to connect database: %w", err)
 		}
 	case "postgres":
-		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Shanghai",
-			config.Database.Host, config.Database.Username, config.Database.Password, config.Database.Name, config.Database.Port)
+		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",
+			config.Database.Host, config.Database.Username, config.Database.Password, config.Database.Name,
+			config.Database.Port, config.Database.SSLMode, config.Database.TimeZone)
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 		if err != nil {

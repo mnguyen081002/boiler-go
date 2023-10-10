@@ -1,24 +1,20 @@
 package controller
 
 import (
-	service "erp/service"
+	"erp/domain"
 
-	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 type UserController struct {
-	userService service.UserService
+	userService domain.UserService
 	logger      *zap.Logger
-	BaseController
 }
 
-func NewUserController(c *gin.RouterGroup, userService service.UserService, logger *zap.Logger) *UserController {
+func NewUserController(userService domain.UserService, logger *zap.Logger) *UserController {
 	controller := &UserController{
 		userService: userService,
 		logger:      logger,
 	}
-	_ = c.Group("/user")
-
 	return controller
 }

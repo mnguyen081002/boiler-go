@@ -24,6 +24,7 @@ type (
 		Services       Services `mapstructure:"services"`
 		Database       Database `mapstructure:"database"`
 		Logger         Logger   `mapstructure:"logger"`
+		Jwt            Jwt      `mapstructure:"jwt"`
 	}
 
 	Server struct {
@@ -40,11 +41,14 @@ type (
 		Username string `mapstructure:"username"`
 		Password string `mapstructure:"password"`
 		Name     string `mapstructure:"name"`
+		SSLMode  string `mapstructure:"sslmode"`
+		TimeZone string `mapstructure:"timeZone"`
 	}
 
-	Nsq struct {
-		Host string `mapstructure:"host"`
-		Port int    `mapstructure:"port"`
+	Jwt struct {
+		Secret                string `mapstructure:"secret"`
+		AccessTokenExpiresIn  int64  `mapstructure:"accessTokenExpiresIn"`
+		RefreshTokenExpiresIn int64  `mapstructure:"refreshTokenExpiresIn"`
 	}
 
 	Logger struct {
@@ -53,24 +57,18 @@ type (
 		Prefix string `mapstructure:"prefix"`
 	}
 
-	Gin struct {
-		Mode string `mapstructure:"mode"`
-	}
-
 	Services struct {
-		CategoryServiceURL string `mapstructure:"categoryServiceURL"`
-		VariantServiceURL  string `mapstructure:"variantServiceURL"`
 	}
 )
 
-func NewConfig() Config {
+func NewConfig() *Config {
 	initConfig()
 	conf := &Config{}
 	err := viper.Unmarshal(conf)
 	if err != nil {
 		fmt.Printf("unable decode into config struct, %v", err)
 	}
-	return *conf
+	return conf
 }
 
 func initConfig() {

@@ -4,30 +4,26 @@ import (
 	"context"
 	config "erp/config"
 	constants "erp/constants"
-	dto "erp/dto/auth"
+	"erp/domain"
 	models "erp/models"
 
+	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type (
-	AuthService interface {
-		Register(ctx context.Context, req dto.RegisterRequest) (item models.User, err error)
-	}
-	AuthServiceImpl struct {
-		userService UserService
-		config      config.Config
-	}
-)
+type AuthServiceImpl struct {
+	userService domain.UserService
+	config      *config.Config
+}
 
-func NewAuthService(userService UserService, config config.Config) AuthService {
+func NewAuthService(userService domain.UserService, config *config.Config) domain.AuthService {
 	return &AuthServiceImpl{
 		userService: userService,
 		config:      config,
 	}
 }
 
-func (a *AuthServiceImpl) Register(ctx context.Context, req dto.RegisterRequest) (user models.User, err error) {
+func (a *AuthServiceImpl) Register(ctx context.Context, req domain.RegisterRequest) (user *models.User, err error) {
 	role := constants.RoleCustomer
 
 	if req.RequestFrom != string(constants.Web) {
@@ -39,12 +35,11 @@ func (a *AuthServiceImpl) Register(ctx context.Context, req dto.RegisterRequest)
 		bcrypt.DefaultCost,
 	)
 	if err != nil {
-		return user, err
+		return nil, errors.Wrap(err, "failed to encrypt password")
 	}
 
 	req.Password = string(encryptedPassword)
-
-	user, err = a.userService.Create(ctx, models.User{
+	user, err = a.userService.Create(ctx, &models.User{
 		Email:     req.Email,
 		Password:  req.Password,
 		FirstName: req.FirstName,
