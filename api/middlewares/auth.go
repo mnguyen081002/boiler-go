@@ -1,12 +1,11 @@
 package middlewares
 
 import (
-	"context"
 	"erp/api/response"
 	"erp/api_errors"
 	"erp/domain"
+	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/pkg/errors"
 
@@ -25,54 +24,15 @@ func (e *GinMiddleware) Auth(authorization bool) gin.HandlerFunc {
 			})
 			return
 		}
-		jwtToken := strings.Split(auth, " ")[1]
+		c.Request.Header.Set("Authorization", auth)
 
-		if jwtToken == "" {
-			c.Errors = append(c.Errors, &gin.Error{
-				Err: errors.New(api_errors.ErrTokenMissing),
-			})
+		fmt.Println("XXXXXXXXXXXXX", c.Writer.Header())
 
-			mas := api_errors.MapErrorCodeMessage[api_errors.ErrTokenMissing]
-			c.AbortWithStatusJSON(mas.Status, response.ResponseError{
-				Message: mas.Message,
-				Code:    api_errors.ErrTokenMissing,
-			})
-			return
-		}
-
-		claims, err := parseToken(jwtToken, e.config.Jwt.Secret)
-		if err != nil {
-			c.Errors = append(c.Errors, &gin.Error{
-				Err: errors.WithStack(err),
-			})
-			mas := api_errors.MapErrorCodeMessage[err.Error()]
-			c.AbortWithStatusJSON(mas.Status, response.ResponseError{
-				Message: mas.Message,
-				Code:    api_errors.ErrTokenInvalid,
-			})
-			return
-		}
-
-		c.Request = c.Request.WithContext(context.WithValue(c.Request.Context(), "x-user-id", claims.Subject))
 		if !authorization {
 			c.Next()
 			return
 		}
 
-		storeID := c.Request.Header.Get("x-store-id")
-		if storeID == "" {
-			c.Errors = append(c.Errors, &gin.Error{
-				Err: errors.New(api_errors.ErrMissingXStoreID),
-			})
-
-			mas := api_errors.MapErrorCodeMessage[api_errors.ErrMissingXStoreID]
-
-			c.AbortWithStatusJSON(mas.Status, response.ResponseError{
-				Message: mas.Message,
-				Code:    api_errors.ErrMissingXStoreID,
-			})
-			return
-		}
 		c.Next()
 	}
 }

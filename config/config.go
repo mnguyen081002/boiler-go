@@ -49,6 +49,7 @@ type (
 		Secret                string `mapstructure:"secret"`
 		AccessTokenExpiresIn  int64  `mapstructure:"accessTokenExpiresIn"`
 		RefreshTokenExpiresIn int64  `mapstructure:"refreshTokenExpiresIn"`
+		Kid                   string `mapstructure:"kid"`
 	}
 
 	Logger struct {

@@ -37,3 +37,20 @@ func (b *AuthController) Register(c *gin.Context) {
 	}
 	Response(c, http.StatusOK, "success", nil)
 }
+
+func (b *AuthController) Login(c *gin.Context) {
+	var req domain.LoginInput
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ResponseError(c, err)
+		return
+	}
+
+	token, err := b.AuthService.Login(c.Request.Context(), req)
+
+	if err != nil {
+		ResponseError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, token)
+}

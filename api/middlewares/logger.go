@@ -54,6 +54,7 @@ func (e *GinMiddleware) Logger(c *gin.Context) {
 	logger("Request",
 		zap.String("Path", path),
 		zap.String("Raw", raw),
+		zap.Any("Header", c.Request.Header),
 		zap.String("Body", string(body)),
 		zap.String("ClientIP", clientIP),
 		zap.String("Method", method),

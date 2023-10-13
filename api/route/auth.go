@@ -12,7 +12,7 @@ type AuthRoutes struct {
 func NewAuthRoutes(handler *lib.Handler, controller *controller.AuthController) *AuthRoutes {
 	g := handler.Group("/auth")
 	g.POST("/register", controller.Register)
-	// g.POST("/login", controller.Login)
+	g.POST("/login", controller.Login)
 	return &AuthRoutes{
 		handler: handler,
 	}

@@ -4,7 +4,7 @@ contextTimeout: 5
 
 server:
   port: '8080'
-  host: '127.0.0.1'
+  host: '0.0.0.0'
   env: 'local'
   useRedis: false
 
@@ -12,10 +12,10 @@ services:
 
 database:
   driver: 'postgres'
-  host: 'localhost'
-  port: 5432
+  host: '192.168.49.2'
+  port: 31145
   username: 'postgres'
-  password: 'admin'
+  password: 'postgres'
   name: 'postgres'
   sslmode: 'disable'
   timezone: 'Asia/Ho_Chi_Minh'
@@ -25,7 +25,8 @@ database:
 
 jwt:
   secret: 'hgG6T23XD25N'
-  accessTokenExpiresIn: 3600
+  accessTokenExpiresIn: 360000
   refreshTokenExpiresIn: 86400
+  kid: 'kid'
 logger:
   level: 'debug'

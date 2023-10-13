@@ -11,19 +11,41 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type AuthServiceImpl struct {
+type authService struct {
 	userService domain.UserService
+	jwtService  domain.JwtService
 	config      *config.Config
 }
 
-func NewAuthService(userService domain.UserService, config *config.Config) domain.AuthService {
-	return &AuthServiceImpl{
+func NewAuthService(userService domain.UserService, jwtService domain.JwtService, config *config.Config) domain.AuthService {
+	return &authService{
 		userService: userService,
+		jwtService:  jwtService,
 		config:      config,
 	}
 }
 
-func (a *AuthServiceImpl) Register(ctx context.Context, req domain.RegisterRequest) (user *models.User, err error) {
+func (a *authService) Login(ctx context.Context, req domain.LoginInput) (result *domain.LoginResult, err error) {
+	return &domain.LoginResult{
+		User: &models.User{},
+		AccessToken: map[string]interface{}{
+			"aud": "http://api.example.com",
+			"iss": "https://krakend.io",
+			"sub": "1234567890qwertyuio",
+			"jti": "mnb23vcsrt756yuiomnbvcx98ertyuiop",
+			"exp": 1735689600,
+		},
+		RefreshToken: map[string]interface{}{
+			"aud": "http://api.example.com",
+			"iss": "https://krakend.io",
+			"sub": "1234567890qwertyuio",
+			"jti": "mnb23vcsrt756yuiomn12876bvcx98ertyuiop",
+			"exp": 1735689600,
+		},
+	}, nil
+}
+
+func (a *authService) Register(ctx context.Context, req domain.RegisterRequest) (user *models.User, err error) {
 	role := constants.RoleCustomer
 
 	if req.RequestFrom != string(constants.Web) {
