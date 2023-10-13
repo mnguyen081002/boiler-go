@@ -2,10 +2,12 @@ package service
 
 import (
 	"context"
+	"erp/api_errors"
 	config "erp/config"
-	constants "erp/constants"
 	"erp/domain"
 	models "erp/models"
+	"erp/utils"
+	"time"
 
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
@@ -13,43 +15,57 @@ import (
 
 type authService struct {
 	userService domain.UserService
-	jwtService  domain.JwtService
 	config      *config.Config
 }
 
-func NewAuthService(userService domain.UserService, jwtService domain.JwtService, config *config.Config) domain.AuthService {
+func NewAuthService(userService domain.UserService, config *config.Config) domain.AuthService {
 	return &authService{
 		userService: userService,
-		jwtService:  jwtService,
 		config:      config,
 	}
 }
 
 func (a *authService) Login(ctx context.Context, req domain.LoginInput) (result *domain.LoginResult, err error) {
+
+	user, err := a.userService.GetByEmail(ctx, req.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		return nil, errors.New(api_errors.ErrInvalidPassword)
+	}
+
 	return &domain.LoginResult{
-		User: &models.User{},
+		User: &domain.LoginUserResult{
+			Email: user.Email,
+		},
 		AccessToken: map[string]interface{}{
-			"aud": "http://api.example.com",
-			"iss": "https://krakend.io",
-			"sub": "1234567890qwertyuio",
-			"jti": "mnb23vcsrt756yuiomnbvcx98ertyuiop",
-			"exp": 1735689600,
+			"aud": a.config.Jwt.Aud,
+			"iss": a.config.Jwt.Iss,
+			"sub": user.ID,
+			"jti": utils.GenerateRandomString(20),
+			"exp": time.Now().Add(time.Duration(a.config.Jwt.AccessTokenExpiresIn)).Unix(),
 		},
 		RefreshToken: map[string]interface{}{
-			"aud": "http://api.example.com",
-			"iss": "https://krakend.io",
-			"sub": "1234567890qwertyuio",
-			"jti": "mnb23vcsrt756yuiomn12876bvcx98ertyuiop",
-			"exp": 1735689600,
+			"aud": a.config.Jwt.Aud,
+			"iss": a.config.Jwt.Iss,
+			"sub": user.ID,
+			"jti": utils.GenerateRandomString(26),
+			"exp": time.Now().Add(time.Duration(a.config.Jwt.RefreshTokenExpiresIn)).Unix(),
 		},
 	}, nil
 }
 
 func (a *authService) Register(ctx context.Context, req domain.RegisterRequest) (user *models.User, err error) {
-	role := constants.RoleCustomer
-
-	if req.RequestFrom != string(constants.Web) {
-		role = constants.RoleSeller
+	user, err = a.userService.GetByEmail(ctx, req.Email)
+	if err != nil {
+		if err.Error() != api_errors.ErrUserNotFound {
+			return nil, err
+		}
+	}
+	if user != nil {
+		return nil, errors.New(api_errors.ErrEmailAlreadyExist)
 	}
 
 	encryptedPassword, err := bcrypt.GenerateFromPassword(
@@ -62,11 +78,8 @@ func (a *authService) Register(ctx context.Context, req domain.RegisterRequest) 
 
 	req.Password = string(encryptedPassword)
 	user, err = a.userService.Create(ctx, &models.User{
-		Email:     req.Email,
-		Password:  req.Password,
-		FirstName: req.FirstName,
-		LastName:  req.LastName,
-		Role:      role,
+		Email:    req.Email,
+		Password: req.Password,
 	})
 
 	return user, err

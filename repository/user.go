@@ -37,7 +37,7 @@ func (u *UserRepositoryImpl) GetByID(ctx context.Context, id string) (res *model
 	return
 }
 
-func (u *UserRepositoryImpl) IsExistEmail(ctx context.Context, email string) (res *models.User, err error) {
+func (u *UserRepositoryImpl) GetByEmail(ctx context.Context, email string) (res *models.User, err error) {
 	err = u.WithContext(ctx).Where("email = ?", email).First(&res).Error
 	if err != nil {
 		if utils.ErrNoRows(err) {

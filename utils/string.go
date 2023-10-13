@@ -1,5 +1,9 @@
 package utils
 
+import (
+	"math/rand"
+)
+
 // RoleID to role_id
 func StructPascalToSnakeCase(str string) string {
 	var result string
@@ -24,4 +28,16 @@ func StructPascalToSnakeCase(str string) string {
 		}
 	}
 	return result
+}
+
+func GenerateRandomString(n int) string {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+	rand.New(rand.NewSource(rand.Int63()))
+
+	result := make([]byte, n)
+	for i := range result {
+		result[i] = charset[rand.Intn(len(charset))]
+	}
+	return string(result)
 }

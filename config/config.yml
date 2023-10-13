@@ -28,5 +28,7 @@ jwt:
   accessTokenExpiresIn: 360000
   refreshTokenExpiresIn: 86400
   kid: 'kid'
+  aud: 'aud'
+  iss: 'iss'
 logger:
   level: 'debug'

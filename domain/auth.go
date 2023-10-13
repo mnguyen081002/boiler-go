@@ -15,11 +15,8 @@ type JwtClaims struct {
 }
 
 type RegisterRequest struct {
-	Email       string `json:"email" binding:"required" validate:"email"`
-	Password    string `json:"password" binding:"required" validate:"min=6,max=20"`
-	FirstName   string `json:"first_name" binding:"required" validate:"min=1,max=50"`
-	LastName    string `json:"last_name" binding:"required" validate:"min=1,max=50"`
-	RequestFrom string `json:"request_from" binding:"required" enums:"erp/,web,app"`
+	Email    string `json:"email" binding:"required" validate:"email"`
+	Password string `json:"password" binding:"required" validate:"min=6,max=20"`
 }
 
 type LoginInput struct {
@@ -27,8 +24,12 @@ type LoginInput struct {
 	Password string `json:"password" binding:"required" validate:"min=6,max=20"`
 }
 
+type LoginUserResult struct {
+	Email string `json:"email"`
+}
+
 type LoginResult struct {
-	User         *models.User           `json:"user"`
+	User         *LoginUserResult       `json:"user"`
 	AccessToken  map[string]interface{} `json:"access_token"`
 	RefreshToken map[string]interface{} `json:"refresh_token"`
 }

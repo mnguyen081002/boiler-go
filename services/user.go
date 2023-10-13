@@ -14,12 +14,6 @@ type (
 	}
 )
 
-// Create implements UserService.
-func (u *UserServiceImpl) Create(ctx context.Context, user *models.User) (*models.User, error) {
-	user, err := u.userRepo.Create(ctx, user)
-	return user, err
-}
-
 func NewUserService(userRepo domain.UserRepository, config *config.Config) domain.UserService {
 	return &UserServiceImpl{
 		userRepo: userRepo,
@@ -30,4 +24,14 @@ func NewUserService(userRepo domain.UserRepository, config *config.Config) domai
 func (s *UserServiceImpl) GetByID(ctx context.Context, id string) (user *models.User, err error) {
 	user, err = s.userRepo.GetByID(ctx, id)
 	return
+}
+
+func (u *UserServiceImpl) GetByEmail(ctx context.Context, email string) (*models.User, error) {
+	user, err := u.userRepo.GetByEmail(ctx, email)
+	return user, err
+}
+
+func (u *UserServiceImpl) Create(ctx context.Context, user *models.User) (*models.User, error) {
+	user, err := u.userRepo.Create(ctx, user)
+	return user, err
 }

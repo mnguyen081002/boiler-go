@@ -19,6 +19,8 @@ var (
 	ErrPermissionDenied     = "10013"
 	ErrInvalidPassword      = "10014"
 	ErrStoreNotFound        = "10015"
+	ErrEmailNotFound        = "10016"
+	ErrEmailAlreadyExist    = "10017"
 )
 
 type MessageAndStatus struct {
@@ -43,4 +45,6 @@ var MapErrorCodeMessage = map[string]MessageAndStatus{
 	ErrPermissionDenied:     {"Permission Denied", http.StatusForbidden},
 	ErrInvalidPassword:      {"Invalid Password", http.StatusBadRequest},
 	ErrStoreNotFound:        {"Store Not Found", http.StatusNotFound},
+	ErrEmailNotFound:        {"Email Not Found", http.StatusNotFound},
+	ErrEmailAlreadyExist:    {"Email Already Exist", http.StatusBadRequest},
 }
