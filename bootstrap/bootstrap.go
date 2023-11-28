@@ -1,15 +1,12 @@
 package bootstrap
 
 import (
-	controller "erp/api/controllers"
-	"erp/api/middlewares"
-	"erp/api/route"
-	config "erp/config"
-	infrastructure "erp/infrastructure"
-	"erp/lib"
-	repository "erp/repository"
-	service "erp/services"
-	utils "erp/utils"
+	"erp/config"
+	"erp/internal/api/middlewares"
+	"erp/internal/infrastructure"
+	"erp/internal/lib"
+	"erp/internal/modules"
+	"erp/internal/utils"
 
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
@@ -26,13 +23,10 @@ func inject() fx.Option {
 			config.NewConfig,
 			utils.NewTimeoutContext,
 		),
-		route.Module,
 		lib.Module,
-		repository.Module,
-		service.Module,
-		controller.Module,
 		middlewares.Module,
 		infrastructure.Module,
+		modules.Module,
 	)
 }
 
