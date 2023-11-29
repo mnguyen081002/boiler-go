@@ -23,7 +23,6 @@ type authService struct {
 }
 
 func NewAuthService(
-	db infrastructure.Database,
 	dbTransaction infrastructure.DatabaseTransaction,
 	userService domain.UserService,
 	ufw *repository.UnitOfWork,
@@ -31,7 +30,6 @@ func NewAuthService(
 	config *config.Config,
 ) domain.AuthService {
 	return &authService{
-		db:            db,
 		dbTransaction: dbTransaction,
 		userService:   userService,
 		ufw:           ufw,
@@ -82,7 +80,7 @@ func (a *authService) Login(ctx context.Context, req domain.LoginRequest) (res d
 		return res, err
 	}
 
-	err = a.dbTransaction.WithTransaction(a.db, func(tx *infrastructure.Database) error {
+	err = a.dbTransaction.WithTransaction(func(tx *infrastructure.Database) error {
 		if _, err := a.ufw.TokenRepository.Upsert(tx, ctx, &models.Token{
 			UserID:    user.ID.String(),
 			ExpiredAt: a.config.Jwt.AccessTokenExpiresIn,

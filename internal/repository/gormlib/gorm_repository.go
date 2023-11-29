@@ -16,13 +16,10 @@ func NewGormRepository(db infrastructure.Database) infrastructure.DatabaseTransa
 	return GormRepository{db}
 }
 
-func (g GormRepository) WithTransaction(db infrastructure.Database, txFunc func(tx *infrastructure.Database) error) (err error) {
-	err = db.RDBMS.Transaction(func(tx *gorm.DB) error {
-		// copy db
-		copyDb := db
-		copyDb.RDBMS = tx
-
-		err := txFunc(&copyDb)
+func (g GormRepository) WithTransaction(txFunc func(tx *infrastructure.Database) error) (err error) {
+	err = g.RDBMS.Transaction(func(tx *gorm.DB) error {
+		g.RDBMS = tx
+		err := txFunc(&g.Database)
 		return err
 	})
 	return err

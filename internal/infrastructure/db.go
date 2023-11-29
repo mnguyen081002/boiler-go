@@ -18,7 +18,7 @@ import (
 )
 
 type DatabaseTransaction interface {
-	WithTransaction(db Database, txFunc func(tx *Database) error) (err error)
+	WithTransaction(txFunc func(tx *Database) error) (err error)
 }
 
 type Database struct {
