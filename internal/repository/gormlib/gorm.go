@@ -11,7 +11,7 @@ type GormRepository struct {
 	infrastructure.Database
 }
 
-func NewGormRepository(db infrastructure.Database) infrastructure.DatabaseTransaction {
+func NewGormTransaction(db infrastructure.Database) infrastructure.DatabaseTransaction {
 	return GormRepository{db}
 }
 

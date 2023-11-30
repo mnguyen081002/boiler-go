@@ -12,7 +12,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
-	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -70,22 +69,22 @@ func NewDatabase(config *config.Config, logger *zap.Logger) Database {
 
 func getDatabaseInstance(config *config.Config) (rdbms *gorm.DB, nosql *mongo.Database, err error) {
 	switch config.Database.Driver {
-	case "mysql":
-		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-			config.Database.Username,
-			config.Database.Password,
-			config.Database.Host,
-			config.Database.Port,
-			config.Database.Name,
-		)
-		rdbms, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
-		if err != nil {
-			return nil, nil, fmt.Errorf("failed to connect database: %w", err)
-		}
+	//case "mysql":
+	//	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+	//		config.Database.Username,
+	//		config.Database.Password,
+	//		config.Database.Host,
+	//		config.Database.Port,
+	//		config.Database.Name,
+	//	)
+	//	rdbms, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	//	if err != nil {
+	//		return nil, nil, fmt.Errorf("failed to connect database: %w", err)
+	//	}
 	case "postgres":
 		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",
-			config.Database.Host, config.Database.Username, config.Database.Password, config.Database.Name,
-			config.Database.Port, config.Database.SSLMode, config.Database.TimeZone)
+			config.Database.Postgres.Host, config.Database.Postgres.Username, config.Database.Postgres.Password, config.Database.Postgres.Name,
+			config.Database.Postgres.Port, config.Database.Postgres.SSLMode, config.Database.Postgres.TimeZone)
 		rdbms, err = gorm.Open(postgres.Open(dsn), &gorm.Config{TranslateError: true})
 
 		if err != nil {
@@ -96,7 +95,7 @@ func getDatabaseInstance(config *config.Config) (rdbms *gorm.DB, nosql *mongo.Da
 
 	case "mongo":
 		ctx := context.TODO()
-		uri := fmt.Sprintf("mongodb://%s:%s@%s:%d/?replicaSet=rs0", config.Database.Username, config.Database.Password, config.Database.Host, config.Database.Port)
+		uri := fmt.Sprintf("mongodb://%s:%s@%s:%d/?replicaSet=rs0", config.Database.Mongo.Username, config.Database.Mongo.Password, config.Database.Mongo.Host, config.Database.Mongo.Port)
 		clientOptions := options.Client().SetDirect(true).ApplyURI(uri)
 		client, err := mongo.Connect(ctx, clientOptions)
 		if err != nil {
@@ -108,7 +107,7 @@ func getDatabaseInstance(config *config.Config) (rdbms *gorm.DB, nosql *mongo.Da
 			log.Fatal(err)
 		}
 
-		nosql = client.Database(config.Database.Name)
+		nosql = client.Database(config.Database.Mongo.Name)
 	}
 
 	return rdbms, nosql, nil

@@ -11,17 +11,23 @@ server:
 services:
 
 database:
-  driver: 'mongo'
-  host: '127.0.0.1'
-  port: '27017'
-  username: 'mongo'
-  password: 'mongo'
-  name: 'mongo'
-  sslmode: 'disable'
-  timezone: 'Asia/Ho_Chi_Minh'
-  maxOpenConnections: 10
-  maxIdleConnections: 5
-  maxConnectionLifetime: 300
+  driver: 'postgres'
+  mongo:
+    host: '127.0.0.1'
+    port: '27017'
+    username: 'mongo'
+    password: 'mongo'
+    name: 'mongo'
+    sslmode: 'disable'
+    timezone: 'Asia/Ho_Chi_Minh'
+  postgres:
+    host: '34.124.207.102'
+    port: '5432'
+    username: 'admin'
+    password: 'admin'
+    name: 'tony-ecommerce'
+    sslmode: 'disable'
+    timezone: 'Asia/Ho_Chi_Minh'
 
 jwt:
   secret: 'hgG6T23XD25N'

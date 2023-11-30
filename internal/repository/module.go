@@ -3,6 +3,7 @@ package repository
 import (
 	"erp/config"
 	"erp/internal/domain"
+	"erp/internal/infrastructure"
 	"erp/internal/repository/gormlib"
 	"erp/internal/repository/mongo"
 	"go.uber.org/fx"
@@ -35,8 +36,16 @@ func NewUnitOfWork(config *config.Config) *UnitOfWork {
 	}
 }
 
+func NewRepository(config *config.Config, database infrastructure.Database) infrastructure.DatabaseTransaction {
+	if config.Database.Driver == "mongo" {
+		return mongo.NewMongoTransaction(database)
+	} else {
+		return gormlib.NewGormTransaction(database)
+	}
+}
+
 var Module = fx.Options(
 	//gormlib.Provides,
 	fx.Provide(NewUnitOfWork),
-	fx.Provide(mongo.NewMongoRepository),
+	fx.Provide(NewRepository),
 )

@@ -35,7 +35,22 @@ type (
 	}
 
 	Database struct {
-		Driver   string `mapstructure:"driver"`
+		Driver   string   `mapstructure:"driver"`
+		Postgres Postgres `mapstructure:"postgres"`
+		Mongo    Mongo    `mapstructure:"mongo"`
+	}
+
+	Postgres struct {
+		Host     string `mapstructure:"host"`
+		Port     int    `mapstructure:"port"`
+		Username string `mapstructure:"username"`
+		Password string `mapstructure:"password"`
+		Name     string `mapstructure:"name"`
+		SSLMode  string `mapstructure:"sslmode"`
+		TimeZone string `mapstructure:"timeZone"`
+	}
+
+	Mongo struct {
 		Host     string `mapstructure:"host"`
 		Port     int    `mapstructure:"port"`
 		Username string `mapstructure:"username"`

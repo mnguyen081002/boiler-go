@@ -13,7 +13,7 @@ type MongoRepository struct {
 	infrastructure.Database
 }
 
-func NewMongoRepository(db infrastructure.Database) infrastructure.DatabaseTransaction {
+func NewMongoTransaction(db infrastructure.Database) infrastructure.DatabaseTransaction {
 	return MongoRepository{db}
 }
 
