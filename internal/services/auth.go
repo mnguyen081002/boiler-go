@@ -14,7 +14,6 @@ import (
 )
 
 type authService struct {
-	db            infrastructure.Database
 	dbTransaction infrastructure.DatabaseTransaction
 	userService   domain.UserService
 	ufw           *repository.UnitOfWork

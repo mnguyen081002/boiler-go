@@ -23,7 +23,8 @@ type DatabaseTransaction interface {
 
 type Database struct {
 	RDBMS   *gorm.DB
-	NoSQLDB *mongo.Database
+	Mongo   *mongo.Database
+	Context context.Context // use for mongo transaction
 	logger  *zap.Logger
 }
 
@@ -48,7 +49,7 @@ func NewDatabase(config *config.Config, logger *zap.Logger) Database {
 		logger.Info("Database connected")
 	}
 
-	db := Database{rdbms, nosql, logger}
+	db := Database{RDBMS: rdbms, Mongo: nosql, logger: logger}
 
 	if config.Database.Driver == "mysql" || config.Database.Driver == "postgres" {
 		db.RegisterTables()
@@ -93,10 +94,11 @@ func getDatabaseInstance(config *config.Config) (rdbms *gorm.DB, nosql *mongo.Da
 
 		rdbms.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
 
-	case "mongodb":
+	case "mongo":
 		ctx := context.TODO()
-		uri := fmt.Sprintf("mongodb://%s:%s@%s:%d", config.Database.Username, config.Database.Password, config.Database.Host, config.Database.Port)
-		clientOptions := options.Client().ApplyURI(uri)
+		uri := fmt.Sprintf("mongodb://%s:%s@%s:%d/?replicaSet=rs0", config.Database.Username, config.Database.Password, config.Database.Host, config.Database.Port)
+		fmt.Println(uri)
+		clientOptions := options.Client().SetDirect(true).ApplyURI(uri)
 		client, err := mongo.Connect(ctx, clientOptions)
 		if err != nil {
 			log.Fatal(err)

@@ -1,13 +1,11 @@
 package service
 
 import (
-	"context"
 	config "erp/config"
 	"erp/internal/api_errors"
 	"erp/internal/constants"
 	"erp/internal/domain"
 	"erp/internal/infrastructure"
-	"erp/internal/models"
 	"erp/internal/repository"
 	"time"
 
@@ -32,14 +30,6 @@ func NewJwtService(ufw *repository.UnitOfWork, db infrastructure.Database, confi
 	}
 }
 
-func (j *jwtService) UpsertToken(db *infrastructure.Database, ctx context.Context, token *models.Token) (*models.Token, error) {
-	t, err := j.ufw.TokenRepository.Upsert(db, ctx, token)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return t, nil
-}
 func (j *jwtService) GenerateToken(userID string, tokenType constants.TokenType, expiresIn int64) (string, error) {
 	claims := domain.JwtClaims{
 		StandardClaims: jwt.StandardClaims{

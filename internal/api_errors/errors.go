@@ -20,6 +20,7 @@ var (
 	ErrInvalidPassword      = "10014"
 	ErrStoreNotFound        = "10015"
 	ErrEmailAlreadyExists   = "10016"
+	ErrEmailNotFound        = "10017"
 )
 
 type MessageAndStatus struct {
@@ -45,4 +46,5 @@ var MapErrorCodeMessage = map[string]MessageAndStatus{
 	ErrInvalidPassword:      {"Invalid Password", http.StatusBadRequest},
 	ErrStoreNotFound:        {"Store Not Found", http.StatusNotFound},
 	ErrEmailAlreadyExists:   {"Email Already Exists", http.StatusConflict},
+	ErrEmailNotFound:        {"Email Not Found", http.StatusNotFound},
 }

@@ -11,12 +11,12 @@ server:
 services:
 
 database:
-  driver: 'postgres'
-  host: 'localhost'
-  port: 5432
-  username: 'postgres'
-  password: 'postgres'
-  name: 'postgres'
+  driver: 'mongo'
+  host: '127.0.0.1'
+  port: '27017'
+  username: 'mongo'
+  password: 'mongo'
+  name: 'mongo'
   sslmode: 'disable'
   timezone: 'Asia/Ho_Chi_Minh'
   maxOpenConnections: 10
