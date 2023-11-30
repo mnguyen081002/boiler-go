@@ -7,7 +7,6 @@ import (
 	"erp/internal/domain"
 	"erp/internal/infrastructure"
 	"erp/internal/models"
-	"fmt"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 	"go.mongodb.org/mongo-driver/bson"
@@ -77,8 +76,6 @@ func (u userRepositoryImpl) GetByEmail(db *infrastructure.Database, ctx context.
 }
 
 func (u userRepositoryImpl) UpdateLastLogin(db *infrastructure.Database, ctx context.Context, id string) error {
-	fmt.Println("update last login", id)
-
 	_, err := db.Mongo.Collection(u.collectionName).UpdateOne(db.Context, bson.M{
 		"_id": uuid.FromStringOrNil(id),
 	}, bson.M{

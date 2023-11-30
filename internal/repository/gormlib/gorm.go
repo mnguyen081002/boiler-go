@@ -3,7 +3,6 @@ package gormlib
 import (
 	"erp/internal/api/request"
 	"erp/internal/infrastructure"
-	"fmt"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
@@ -42,8 +41,6 @@ func GormQueryPagination[E any](tx *gorm.DB, o request.PageOptions, data *[]*E) 
 	offset := (o.Page - 1) * o.Limit
 
 	q.tx = q.tx.Debug().Offset(int(offset)).Limit(int(o.Limit)).Find(&data)
-
-	fmt.Println(q.tx.Error)
 	return q
 }
 

@@ -8,7 +8,6 @@ import (
 	"erp/internal/infrastructure"
 	"erp/internal/models"
 	"erp/internal/repository"
-	"fmt"
 )
 
 type (
@@ -27,8 +26,6 @@ func NewUserService(ufw *repository.UnitOfWork, db infrastructure.Database, conf
 	}
 }
 func (u *userService) Create(ctx context.Context, user *models.User) (*models.User, error) {
-	fmt.Println(user)
-
 	if _, err := u.ufw.UserRepository.Create(&u.db, ctx, user); err != nil {
 		return nil, err
 	}

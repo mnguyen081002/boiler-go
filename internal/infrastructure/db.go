@@ -97,7 +97,6 @@ func getDatabaseInstance(config *config.Config) (rdbms *gorm.DB, nosql *mongo.Da
 	case "mongo":
 		ctx := context.TODO()
 		uri := fmt.Sprintf("mongodb://%s:%s@%s:%d/?replicaSet=rs0", config.Database.Username, config.Database.Password, config.Database.Host, config.Database.Port)
-		fmt.Println(uri)
 		clientOptions := options.Client().SetDirect(true).ApplyURI(uri)
 		client, err := mongo.Connect(ctx, clientOptions)
 		if err != nil {
