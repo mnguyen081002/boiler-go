@@ -21,7 +21,7 @@ database:
     sslmode: 'disable'
     timezone: 'Asia/Ho_Chi_Minh'
   postgres:
-    host: '34.124.207.102'
+    host: 'localhost'
     port: '5432'
     username: 'admin'
     password: 'admin'
